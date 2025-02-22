@@ -9,6 +9,7 @@ import Music from "./pages/Music";
 import Artists from "./pages/Artists";
 import About from "./pages/About";
 import NotFound from "./pages/NotFound";
+import ArtistProfile from "./pages/ArtistProfile";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +23,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/music" element={<Music />} />
           <Route path="/artists" element={<Artists />} />
+          <Route path="/artist/:id" element={<ArtistProfile />} />
           <Route path="/about" element={<About />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
