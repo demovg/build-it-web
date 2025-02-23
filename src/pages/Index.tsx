@@ -6,7 +6,7 @@ export default function Index() {
   const navigate = useNavigate()
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-secondary">
+    <div className="min-h-screen bg-[url('/your-background-image-url-here')] bg-cover bg-center bg-fixed">
       {/* Navigation */}
       <nav className="fixed top-0 w-full backdrop-blur-sm border-b border-border/40 z-50">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
@@ -19,6 +19,9 @@ export default function Index() {
             </Button>
             <Button variant="ghost" onClick={() => navigate("/artists")}>
               Artists
+            </Button>
+            <Button variant="ghost" onClick={() => navigate("/teams")}>
+              Teams
             </Button>
             <Button variant="ghost" onClick={() => navigate("/about")}>
               About
@@ -42,10 +45,10 @@ export default function Index() {
               Join us in shaping the next generation of sound.
             </p>
             <div className="flex gap-4 pt-4">
-              <Button size="lg" className="bg-accent hover:bg-accent/90">
+              <Button size="lg" className="bg-accent hover:bg-accent/90" onClick={() => navigate("/music")}>
                 Explore Music
               </Button>
-              <Button size="lg" variant="outline">
+              <Button size="lg" variant="outline" onClick={() => navigate("/artists")}>
                 Meet Our Artists
               </Button>
             </div>
@@ -60,7 +63,7 @@ export default function Index() {
                 <p className="text-muted-foreground">
                   Check out our newest tracks and upcoming releases from our talented artists.
                 </p>
-                <Button className="w-full" variant="secondary">
+                <Button className="w-full" variant="secondary" onClick={() => navigate("/music")}>
                   Listen Now
                 </Button>
               </div>

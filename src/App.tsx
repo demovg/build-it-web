@@ -10,6 +10,8 @@ import Artists from "./pages/Artists";
 import About from "./pages/About";
 import NotFound from "./pages/NotFound";
 import ArtistProfile from "./pages/ArtistProfile";
+import Teams from "./pages/Teams";
+import Contact from "./pages/Contact";
 
 const queryClient = new QueryClient();
 
@@ -24,7 +26,9 @@ const App = () => (
           <Route path="/music" element={<Music />} />
           <Route path="/artists" element={<Artists />} />
           <Route path="/artist/:id" element={<ArtistProfile />} />
+          <Route path="/teams" element={<Teams />} />
           <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button"
 import { useNavigate } from "react-router-dom"
 
-export default function About() {
+export default function Contact() {
   const navigate = useNavigate()
 
   return (
@@ -33,42 +33,52 @@ export default function About() {
         </div>
       </nav>
 
-      {/* About Content */}
+      {/* Contact Content */}
       <section className="container mx-auto px-4 pt-24">
-        <div className="max-w-4xl mx-auto space-y-12">
+        <div className="max-w-4xl mx-auto space-y-8">
           <div className="space-y-4">
-            <h1 className="text-4xl font-bold">About The 411</h1>
+            <h1 className="text-4xl font-bold">Contact Us</h1>
             <p className="text-lg text-muted-foreground">
-              We're more than just a record label - we're a community of artists and music lovers 
-              dedicated to pushing the boundaries of sound.
+              We'd love to hear from you. Get in touch with us for any inquiries.
             </p>
           </div>
 
-          {/* Mission Statement */}
           <div className="relative">
             <div className="absolute -inset-1 rounded-lg bg-gradient-to-r from-accent to-primary blur-lg opacity-75" />
             <div className="relative bg-background/80 backdrop-blur-xl rounded-lg p-8 border border-border/40">
-              <h2 className="text-2xl font-semibold mb-4">Our Mission</h2>
-              <p className="text-muted-foreground">
-                To discover and nurture talented artists, providing them with the platform and resources 
-                they need to create exceptional music that moves and inspires people around the world.
-              </p>
+              <form className="space-y-6">
+                <div className="space-y-2">
+                  <label htmlFor="name" className="block text-sm font-medium">Name</label>
+                  <input
+                    type="text"
+                    id="name"
+                    className="w-full p-2 rounded-md border border-border bg-background/50"
+                    placeholder="Your name"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="email" className="block text-sm font-medium">Email</label>
+                  <input
+                    type="email"
+                    id="email"
+                    className="w-full p-2 rounded-md border border-border bg-background/50"
+                    placeholder="your@email.com"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="message" className="block text-sm font-medium">Message</label>
+                  <textarea
+                    id="message"
+                    rows={4}
+                    className="w-full p-2 rounded-md border border-border bg-background/50"
+                    placeholder="Your message"
+                  />
+                </div>
+                <Button className="w-full bg-accent hover:bg-accent/90">
+                  Send Message
+                </Button>
+              </form>
             </div>
-          </div>
-
-          {/* Contact Section */}
-          <div className="space-y-6">
-            <h2 className="text-2xl font-semibold">Get in Touch</h2>
-            <p className="text-muted-foreground">
-              Have questions or want to work with us? We'd love to hear from you.
-            </p>
-            <Button 
-              size="lg" 
-              className="bg-accent hover:bg-accent/90"
-              onClick={() => navigate("/contact")}
-            >
-              Contact Us
-            </Button>
           </div>
         </div>
       </section>
