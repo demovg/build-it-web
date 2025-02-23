@@ -12,6 +12,9 @@ import NotFound from "./pages/NotFound";
 import ArtistProfile from "./pages/ArtistProfile";
 import Teams from "./pages/Teams";
 import Contact from "./pages/Contact";
+import Login from "./pages/Login";
+import SignIn from "./pages/SignIn";
+import Premium from "./pages/Premium";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +32,9 @@ const App = () => (
           <Route path="/teams" element={<Teams />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signin" element={<SignIn />} />
+          <Route path="/premium" element={<Premium />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
