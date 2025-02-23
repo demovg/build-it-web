@@ -1,7 +1,7 @@
+
 #root {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
   text-align: center;
 }
 
@@ -39,4 +39,13 @@
 
 .read-the-docs {
   color: #888;
+}
+
+/* Add styles for the navigation and footer */
+.nav-link {
+  @apply text-white hover:text-accent transition-colors;
+}
+
+.footer-link {
+  @apply text-sm text-gray-600 hover:text-gray-900 transition-colors;
 }
