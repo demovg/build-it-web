@@ -1,9 +1,19 @@
 
 import { Button } from "@/components/ui/button"
 import { useNavigate } from "react-router-dom"
+import { useAuth } from "@/contexts/AuthContext"
+import { useState } from "react"
 
 export default function Login() {
   const navigate = useNavigate()
+  const { signIn } = useAuth()
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    await signIn(email, password)
+  }
 
   return (
     <div className="min-h-screen bg-[url('/your-background-image-url-here')] bg-cover bg-center bg-fixed">
@@ -48,14 +58,17 @@ export default function Login() {
             <div className="absolute -inset-1 rounded-lg bg-gradient-to-r from-accent to-primary blur-lg opacity-75" />
             <div className="relative bg-background/80 backdrop-blur-xl rounded-lg p-8 shadow-xl border border-border/40">
               <h2 className="text-2xl font-bold mb-6 text-center">Welcome Back</h2>
-              <form className="space-y-4">
+              <form className="space-y-4" onSubmit={handleSubmit}>
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium mb-1">Email</label>
                   <input
                     type="email"
                     id="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     className="w-full p-2 rounded-md border border-border bg-background/50"
                     placeholder="you@example.com"
+                    required
                   />
                 </div>
                 <div>
@@ -63,11 +76,14 @@ export default function Login() {
                   <input
                     type="password"
                     id="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     className="w-full p-2 rounded-md border border-border bg-background/50"
                     placeholder="••••••••"
+                    required
                   />
                 </div>
-                <Button className="w-full bg-accent hover:bg-accent/90">
+                <Button type="submit" className="w-full bg-accent hover:bg-accent/90">
                   Log In
                 </Button>
                 <p className="text-sm text-center text-muted-foreground">
