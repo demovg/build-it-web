@@ -11,10 +11,34 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { User, LogOut, Settings, Music, Crown } from "lucide-react"
+import { useState, useEffect } from "react"
+import { supabase } from "@/integrations/supabase/client"
 
 export default function Index() {
   const navigate = useNavigate()
   const { user, signOut } = useAuth()
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (user) {
+      getProfile()
+    }
+  }, [user])
+
+  async function getProfile() {
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("avatar_url")
+        .eq("id", user?.id)
+        .single()
+
+      if (error) throw error
+      if (data) setAvatarUrl(data.avatar_url)
+    } catch (error) {
+      console.error("Error loading avatar:", error)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-[url('/your-background-image-url-here')] bg-cover bg-center bg-fixed">
@@ -44,7 +68,7 @@ export default function Index() {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                     <Avatar className="h-10 w-10">
-                      <AvatarImage src={user.user_metadata.avatar_url} alt={user.email || ""} />
+                      <AvatarImage src={avatarUrl || ""} alt={user.email || ""} />
                       <AvatarFallback>{user.email?.charAt(0).toUpperCase()}</AvatarFallback>
                     </Avatar>
                   </Button>
