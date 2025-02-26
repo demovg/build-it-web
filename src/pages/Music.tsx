@@ -1,6 +1,16 @@
 import { Button } from "@/components/ui/button"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "@/contexts/AuthContext"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { User, LogOut, Settings, Music, Crown } from "lucide-react"
 
 export default function Music() {
   const navigate = useNavigate()
@@ -33,14 +43,41 @@ export default function Music() {
           </div>
           <div className="flex gap-4">
             {user ? (
-              <>
-                <Button variant="ghost" className="text-white hover:text-accent" onClick={() => navigate("/profile")}>
-                  Profile
-                </Button>
-                <Button variant="ghost" className="text-white hover:text-accent" onClick={signOut}>
-                  Sign Out
-                </Button>
-              </>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                    <Avatar className="h-10 w-10">
+                      <AvatarImage src={user.user_metadata.avatar_url} alt={user.email || ""} />
+                      <AvatarFallback>{user.email?.charAt(0).toUpperCase()}</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end">
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate("/profile")}>
+                    <User className="mr-2 h-4 w-4" />
+                    Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/music")}>
+                    <Music className="mr-2 h-4 w-4" />
+                    My Music
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/premium")}>
+                    <Crown className="mr-2 h-4 w-4" />
+                    Premium
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/settings")}>
+                    <Settings className="mr-2 h-4 w-4" />
+                    Settings
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={signOut}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : (
               <>
                 <Button variant="ghost" className="text-white hover:text-accent" onClick={() => navigate("/login")}>
