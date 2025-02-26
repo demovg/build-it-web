@@ -5,13 +5,15 @@ import { useNavigate } from "react-router-dom"
 import { supabase } from "@/integrations/supabase/client"
 import { toast } from "sonner"
 
+type AppRole = 'admin' | 'user' | 'moderator';
+
 interface AuthContextType {
   user: User | null
   session: Session | null
   signUp: (email: string, password: string, fullName: string) => Promise<void>
   signIn: (email: string, password: string) => Promise<void>
   signOut: () => Promise<void>
-  hasRole: (role: string) => Promise<boolean>
+  hasRole: (role: AppRole) => Promise<boolean>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -83,7 +85,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const hasRole = async (role: string) => {
+  const hasRole = async (role: AppRole) => {
     try {
       const { data, error } = await supabase
         .rpc('has_role', {

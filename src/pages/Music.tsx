@@ -1,8 +1,10 @@
 import { Button } from "@/components/ui/button"
 import { useNavigate } from "react-router-dom"
+import { useAuth } from "@/contexts/AuthContext"
 
 export default function Music() {
   const navigate = useNavigate()
+  const { user, signOut } = useAuth()
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary">
@@ -30,12 +32,25 @@ export default function Music() {
             </Button>
           </div>
           <div className="flex gap-4">
-            <Button variant="ghost" className="text-white hover:text-accent" onClick={() => navigate("/login")}>
-              Login
-            </Button>
-            <Button variant="ghost" className="text-white hover:text-accent" onClick={() => navigate("/signin")}>
-              Sign Up
-            </Button>
+            {user ? (
+              <>
+                <Button variant="ghost" className="text-white hover:text-accent" onClick={() => navigate("/profile")}>
+                  Profile
+                </Button>
+                <Button variant="ghost" className="text-white hover:text-accent" onClick={signOut}>
+                  Sign Out
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="ghost" className="text-white hover:text-accent" onClick={() => navigate("/login")}>
+                  Login
+                </Button>
+                <Button variant="ghost" className="text-white hover:text-accent" onClick={() => navigate("/signin")}>
+                  Sign Up
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </nav>

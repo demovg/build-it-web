@@ -1,9 +1,10 @@
-
 import { Button } from "@/components/ui/button"
 import { useNavigate } from "react-router-dom"
+import { useAuth } from "@/contexts/AuthContext"
 
 export default function Index() {
   const navigate = useNavigate()
+  const { user, signOut } = useAuth()
 
   return (
     <div className="min-h-screen bg-[url('/your-background-image-url-here')] bg-cover bg-center bg-fixed">
@@ -28,12 +29,25 @@ export default function Index() {
             </Button>
           </div>
           <div className="flex gap-4">
-            <Button variant="ghost" className="text-white hover:text-accent" onClick={() => navigate("/login")}>
-              Login
-            </Button>
-            <Button variant="ghost" className="text-white hover:text-accent" onClick={() => navigate("/signin")}>
-              Sign Up
-            </Button>
+            {user ? (
+              <>
+                <Button variant="ghost" className="text-white hover:text-accent" onClick={() => navigate("/profile")}>
+                  Profile
+                </Button>
+                <Button variant="ghost" className="text-white hover:text-accent" onClick={signOut}>
+                  Sign Out
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="ghost" className="text-white hover:text-accent" onClick={() => navigate("/login")}>
+                  Login
+                </Button>
+                <Button variant="ghost" className="text-white hover:text-accent" onClick={() => navigate("/signin")}>
+                  Sign Up
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </nav>
