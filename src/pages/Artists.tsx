@@ -1,11 +1,81 @@
+
 import { Button } from "@/components/ui/button"
 import { useNavigate } from "react-router-dom"
+import { useState, useEffect } from "react"
+import { supabase } from "@/integrations/supabase/client"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { toast } from "sonner"
+import { useAuth } from "@/contexts/AuthContext"
+
+interface Artist {
+  id: string
+  name: string
+  genre: string | null
+  style: string | null
+  avatar_url: string | null
+  user_id: string | null
+}
 
 export default function Artists() {
   const navigate = useNavigate()
+  const { user } = useAuth()
+  const [artists, setArtists] = useState<Artist[]>([])
+
+  useEffect(() => {
+    fetchArtists()
+  }, [])
+
+  async function fetchArtists() {
+    try {
+      const { data, error } = await supabase
+        .from('artists')
+        .select('*')
+
+      if (error) throw error
+      if (data) setArtists(data)
+    } catch (error) {
+      console.error('Error fetching artists:', error)
+      toast.error('Failed to load artists')
+    }
+  }
+
+  async function handleImageUpload(event: React.ChangeEvent<HTMLInputElement>, artistId: string) {
+    try {
+      if (!event.target.files || event.target.files.length === 0) {
+        throw new Error('You must select an image to upload.')
+      }
+
+      const file = event.target.files[0]
+      const fileExt = file.name.split('.').pop()
+      const filePath = `${artistId}.${fileExt}`
+
+      const { error: uploadError } = await supabase.storage
+        .from('artists')
+        .upload(filePath, file, { upsert: true })
+
+      if (uploadError) throw uploadError
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('artists')
+        .getPublicUrl(filePath)
+
+      const { error: updateError } = await supabase
+        .from('artists')
+        .update({ avatar_url: publicUrl })
+        .eq('id', artistId)
+
+      if (updateError) throw updateError
+
+      toast.success('Profile picture updated!')
+      fetchArtists() // Refresh the list
+    } catch (error) {
+      console.error('Error uploading image:', error)
+      toast.error('Error uploading image')
+    }
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-secondary bg-[url('your-background-image-url-here')] bg-cover bg-center bg-fixed">
+    <div className="min-h-screen bg-gradient-to-b from-background to-secondary">
       {/* Navigation */}
       <nav className="fixed top-0 w-full backdrop-blur-sm border-b border-border/40 z-50">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
@@ -52,47 +122,45 @@ export default function Artists() {
 
           {/* Artist Grid */}
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Artist Card */}
-            <div className="group relative">
-              <div className="absolute -inset-1 rounded-lg bg-gradient-to-r from-accent to-primary blur-lg opacity-75 group-hover:opacity-100 transition-opacity" />
-              <div className="relative bg-background/80 backdrop-blur-xl rounded-lg p-6 space-y-4 border border-border/40">
-                <div className="w-24 h-24 mx-auto rounded-full bg-accent/10 flex items-center justify-center">
-                  <span className="text-4xl">👤</span>
+            {artists.map((artist) => (
+              <div key={artist.id} className="group relative">
+                <div className="absolute -inset-1 rounded-lg bg-gradient-to-r from-accent to-primary blur-lg opacity-75 group-hover:opacity-100 transition-opacity" />
+                <div className="relative bg-background/80 backdrop-blur-xl rounded-lg p-6 space-y-4 border border-border/40">
+                  <div className="relative">
+                    <Avatar className="w-24 h-24 mx-auto">
+                      <AvatarImage src={artist.avatar_url || ""} alt={artist.name} />
+                      <AvatarFallback>{artist.name.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                    {user?.id === artist.user_id && (
+                      <label className="absolute bottom-0 right-0 cursor-pointer">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => handleImageUpload(e, artist.id)}
+                        />
+                        <div className="bg-primary text-primary-foreground rounded-full p-2 hover:bg-primary/90">
+                          📷
+                        </div>
+                      </label>
+                    )}
+                  </div>
+                  <div className="text-center">
+                    <h3 className="text-xl font-semibold">{artist.name}</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {artist.genre} • {artist.style}
+                    </p>
+                  </div>
+                  <Button 
+                    className="w-full" 
+                    variant="outline"
+                    onClick={() => navigate(`/artist/${artist.id}`)}
+                  >
+                    View Profile
+                  </Button>
                 </div>
-                <div className="text-center">
-                  <h3 className="text-xl font-semibold">Artist Name</h3>
-                  <p className="text-sm text-muted-foreground">Genre • Style</p>
-                </div>
-                <Button 
-                  className="w-full" 
-                  variant="outline"
-                  onClick={() => navigate("/artist/1")}
-                >
-                  View Profile
-                </Button>
               </div>
-            </div>
-
-            {/* Second Artist */}
-            <div className="group relative">
-              <div className="absolute -inset-1 rounded-lg bg-gradient-to-r from-accent to-primary blur-lg opacity-75 group-hover:opacity-100 transition-opacity" />
-              <div className="relative bg-background/80 backdrop-blur-xl rounded-lg p-6 space-y-4 border border-border/40">
-                <div className="w-24 h-24 mx-auto rounded-full bg-accent/10 flex items-center justify-center">
-                  <span className="text-4xl">👤</span>
-                </div>
-                <div className="text-center">
-                  <h3 className="text-xl font-semibold">Artist Name</h3>
-                  <p className="text-sm text-muted-foreground">Genre • Style</p>
-                </div>
-                <Button 
-                  className="w-full" 
-                  variant="outline"
-                  onClick={() => navigate("/artist/2")}
-                >
-                  View Profile
-                </Button>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>

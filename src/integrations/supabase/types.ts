@@ -9,6 +9,39 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      artists: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          created_at: string | null
+          genre: string | null
+          id: string
+          name: string
+          style: string | null
+          user_id: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string | null
+          genre?: string | null
+          id?: string
+          name: string
+          style?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string | null
+          genre?: string | null
+          id?: string
+          name?: string
+          style?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -48,6 +81,36 @@ export type Database = {
           updated_at?: string | null
           username?: string | null
           website?: string | null
+        }
+        Relationships: []
+      }
+      team_members: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          created_at: string | null
+          id: string
+          name: string
+          role: string
+          user_id: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string | null
+          id?: string
+          name: string
+          role: string
+          user_id?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string | null
+          id?: string
+          name?: string
+          role?: string
+          user_id?: string | null
         }
         Relationships: []
       }
