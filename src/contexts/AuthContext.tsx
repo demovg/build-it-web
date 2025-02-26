@@ -11,6 +11,7 @@ interface AuthContextType {
   signUp: (email: string, password: string, fullName: string) => Promise<void>
   signIn: (email: string, password: string) => Promise<void>
   signOut: () => Promise<void>
+  hasRole: (role: string) => Promise<boolean>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -82,12 +83,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  const hasRole = async (role: string) => {
+    try {
+      const { data, error } = await supabase
+        .rpc('has_role', {
+          requested_user_id: user?.id,
+          requested_role: role
+        })
+      
+      if (error) throw error
+      return data || false
+    } catch (error) {
+      console.error('Error checking role:', error)
+      return false
+    }
+  }
+
   if (loading) {
     return <div>Loading...</div>
   }
 
   return (
-    <AuthContext.Provider value={{ user, session, signUp, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, session, signUp, signIn, signOut, hasRole }}>
       {children}
     </AuthContext.Provider>
   )

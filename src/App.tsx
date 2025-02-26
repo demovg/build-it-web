@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Music from "./pages/Music";
 import Artists from "./pages/Artists";
@@ -16,6 +17,7 @@ import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import SignIn from "./pages/SignIn";
 import Premium from "./pages/Premium";
+import Profile from "./pages/Profile";
 
 const queryClient = new QueryClient();
 
@@ -36,7 +38,22 @@ const App = () => (
             <Route path="/contact" element={<Contact />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signin" element={<SignIn />} />
-            <Route path="/premium" element={<Premium />} />
+            <Route 
+              path="/premium" 
+              element={
+                <ProtectedRoute>
+                  <Premium />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/profile" 
+              element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              } 
+            />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
