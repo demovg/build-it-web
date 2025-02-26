@@ -7,7 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
-import Music from "./pages/Music";
+import MusicPage from "./pages/Music";
 import Artists from "./pages/Artists";
 import About from "./pages/About";
 import NotFound from "./pages/NotFound";
@@ -30,7 +30,7 @@ const App = () => (
           <Sonner />
           <Routes>
             <Route path="/" element={<Index />} />
-            <Route path="/music" element={<Music />} />
+            <Route path="/music" element={<MusicPage />} />
             <Route path="/artists" element={<Artists />} />
             <Route path="/artist/:id" element={<ArtistProfile />} />
             <Route path="/teams" element={<Teams />} />

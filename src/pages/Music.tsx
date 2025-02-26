@@ -12,7 +12,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { User, LogOut, Settings, Music, Crown } from "lucide-react"
 
-export default function Music() {
+export default function MusicPage() {
   const navigate = useNavigate()
   const { user, signOut } = useAuth()
 
