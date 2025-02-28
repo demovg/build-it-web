@@ -8,6 +8,17 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "sonner"
 import { supabase } from "@/integrations/supabase/client"
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger
+} from "@/components/ui/alert-dialog"
 
 interface ProfileFormData {
   full_name: string
@@ -19,7 +30,7 @@ interface ProfileFormData {
 }
 
 export default function Profile() {
-  const { user } = useAuth()
+  const { user, deleteAccount } = useAuth()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState<ProfileFormData>({
@@ -80,7 +91,7 @@ export default function Profile() {
 
       const file = event.target.files[0]
       const fileExt = file.name.split('.').pop()
-      const filePath = `${user.id}/${Math.random()}.${fileExt}`
+      const filePath = `${user.id}-${Date.now()}.${fileExt}`
 
       const { error: uploadError } = await supabase.storage
         .from('avatars')
@@ -93,11 +104,28 @@ export default function Profile() {
         .getPublicUrl(filePath)
 
       setFormData({ ...formData, avatar_url: publicUrl })
+      
+      // Update the profile with the new avatar URL
+      const { error: updateError } = await supabase
+        .from("profiles")
+        .update({ avatar_url: publicUrl })
+        .eq("id", user.id)
+        
+      if (updateError) throw updateError
+      
       toast.success("Avatar updated!")
     } catch (error: any) {
       toast.error(error.message)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleDeleteAccount = async () => {
+    try {
+      await deleteAccount()
+    } catch (error: any) {
+      toast.error(error.message || "Failed to delete account")
     }
   }
 
@@ -205,6 +233,32 @@ export default function Profile() {
             >
               {loading ? "Updating..." : "Update Profile"}
             </Button>
+            
+            <div className="pt-8 border-t border-border/40">
+              <h2 className="text-xl font-bold text-destructive mb-4">Danger Zone</h2>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive" className="w-full">
+                    Delete Account
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone. This will permanently delete your account
+                      and remove all your data from our servers.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleDeleteAccount} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                      Delete Account
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
           </div>
         </div>
       </div>

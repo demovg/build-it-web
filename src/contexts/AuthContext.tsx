@@ -13,6 +13,7 @@ interface AuthContextType {
   signUp: (email: string, password: string, fullName: string) => Promise<void>
   signIn: (email: string, password: string) => Promise<void>
   signOut: () => Promise<void>
+  deleteAccount: () => Promise<void>
   hasRole: (role: AppRole) => Promise<boolean>
 }
 
@@ -85,6 +86,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  const deleteAccount = async () => {
+    try {
+      if (!user) throw new Error("No user logged in")
+      
+      // Delete user data from profiles table
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .delete()
+        .eq('id', user.id)
+        
+      if (profileError) throw profileError
+      
+      // Delete user's auth account
+      const { error } = await supabase.auth.admin.deleteUser(user.id)
+      if (error) throw error
+      
+      // Sign out
+      await supabase.auth.signOut()
+      toast.success("Your account has been deleted")
+      navigate("/login")
+    } catch (error: any) {
+      console.error("Error deleting account:", error)
+      toast.error(error.message || "Failed to delete account")
+    }
+  }
+
   const hasRole = async (role: AppRole) => {
     try {
       const { data, error } = await supabase
@@ -106,7 +133,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, session, signUp, signIn, signOut, hasRole }}>
+    <AuthContext.Provider value={{ user, session, signUp, signIn, signOut, deleteAccount, hasRole }}>
       {children}
     </AuthContext.Provider>
   )
