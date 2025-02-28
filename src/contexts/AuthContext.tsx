@@ -90,7 +90,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       if (!user) throw new Error("No user logged in")
       
-      // Delete user data from profiles table
+      // Delete user data from profiles table first
       const { error: profileError } = await supabase
         .from('profiles')
         .delete()
@@ -98,11 +98,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         
       if (profileError) throw profileError
       
-      // Delete user's auth account
-      const { error } = await supabase.auth.admin.deleteUser(user.id)
-      if (error) throw error
+      // Instead of using the admin API, we'll use the user's own session to delete their account
+      const { error } = await supabase.rpc('delete_user')
       
-      // Sign out
+      if (error) {
+        // If the RPC function fails, at least sign the user out
+        await supabase.auth.signOut()
+        throw error
+      }
+      
+      // Sign out after successful deletion
       await supabase.auth.signOut()
       toast.success("Your account has been deleted")
       navigate("/login")
