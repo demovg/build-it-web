@@ -22,6 +22,7 @@ export default function TeamMemberProfile() {
   const { user } = useAuth()
   const [teamMember, setTeamMember] = useState<TeamMember | null>(null)
   const [loading, setLoading] = useState(true)
+  const [imageKey, setImageKey] = useState(Date.now()) // Add key for forcing image refresh
 
   useEffect(() => {
     if (id) {
@@ -56,18 +57,21 @@ export default function TeamMemberProfile() {
 
       const file = event.target.files[0]
       const fileExt = file.name.split('.').pop()
-      const filePath = `${teamMember.id}.${fileExt}`
+      const fileName = `${teamMember.id}-${Date.now()}.${fileExt}` // Add timestamp to prevent caching
 
+      // Upload the file
       const { error: uploadError } = await supabase.storage
         .from('team-members')
-        .upload(filePath, file, { upsert: true })
+        .upload(fileName, file, { upsert: true })
 
       if (uploadError) throw uploadError
 
+      // Get the public URL
       const { data: { publicUrl } } = supabase.storage
         .from('team-members')
-        .getPublicUrl(filePath)
+        .getPublicUrl(fileName)
 
+      // Update the team member record
       const { error: updateError } = await supabase
         .from('team_members')
         .update({ avatar_url: publicUrl })
@@ -75,12 +79,15 @@ export default function TeamMemberProfile() {
 
       if (updateError) throw updateError
 
-      // Update local state
+      // Update local state with new URL
       setTeamMember({
         ...teamMember,
         avatar_url: publicUrl
       })
-
+      
+      // Force image refresh
+      setImageKey(Date.now())
+      
       toast.success('Profile picture updated!')
     } catch (error) {
       console.error('Error uploading image:', error)
@@ -155,7 +162,10 @@ export default function TeamMemberProfile() {
               <div className="flex flex-col md:flex-row gap-8 items-start">
                 <div className="relative">
                   <Avatar className="w-32 h-32">
-                    <AvatarImage src={teamMember.avatar_url || ""} alt={teamMember.name} />
+                    <AvatarImage 
+                      src={`${teamMember.avatar_url}?v=${imageKey}`} 
+                      alt={teamMember.name} 
+                    />
                     <AvatarFallback>{teamMember.name.charAt(0)}</AvatarFallback>
                   </Avatar>
                   {user?.id === teamMember.user_id && (
