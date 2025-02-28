@@ -99,7 +99,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (profileError) throw profileError
       
       // Instead of using the admin API, we'll use the user's own session to delete their account
-      const { error } = await supabase.rpc('delete_user')
+      const { error } = await supabase
+        .rpc('delete_user')
       
       if (error) {
         // If the RPC function fails, at least sign the user out
