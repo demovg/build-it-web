@@ -13,6 +13,7 @@ import About from "./pages/About";
 import NotFound from "./pages/NotFound";
 import ArtistProfile from "./pages/ArtistProfile";
 import Teams from "./pages/Teams";
+import TeamMemberProfile from "./pages/TeamMemberProfile";
 import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import SignIn from "./pages/SignIn";
@@ -34,6 +35,7 @@ const App = () => (
             <Route path="/artists" element={<Artists />} />
             <Route path="/artist/:id" element={<ArtistProfile />} />
             <Route path="/teams" element={<Teams />} />
+            <Route path="/team-member/:id" element={<TeamMemberProfile />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/login" element={<Login />} />

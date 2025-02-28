@@ -7,43 +7,42 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { toast } from "sonner"
 import { useAuth } from "@/contexts/AuthContext"
 
-interface Artist {
+interface TeamMember {
   id: string
   name: string
-  genre: string | null
-  style: string | null
+  role: string
   bio: string | null
   avatar_url: string | null
   user_id: string | null
 }
 
-export default function ArtistProfile() {
+export default function TeamMemberProfile() {
   const navigate = useNavigate()
   const { id } = useParams<{ id: string }>()
   const { user } = useAuth()
-  const [artist, setArtist] = useState<Artist | null>(null)
+  const [teamMember, setTeamMember] = useState<TeamMember | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     if (id) {
-      fetchArtist(id)
+      fetchTeamMember(id)
     }
   }, [id])
 
-  async function fetchArtist(artistId: string) {
+  async function fetchTeamMember(memberId: string) {
     try {
       setLoading(true)
       const { data, error } = await supabase
-        .from('artists')
+        .from('team_members')
         .select('*')
-        .eq('id', artistId)
+        .eq('id', memberId)
         .single()
 
       if (error) throw error
-      setArtist(data)
+      setTeamMember(data)
     } catch (error) {
-      console.error('Error fetching artist:', error)
-      toast.error('Failed to load artist profile')
+      console.error('Error fetching team member:', error)
+      toast.error('Failed to load team member profile')
     } finally {
       setLoading(false)
     }
@@ -51,34 +50,34 @@ export default function ArtistProfile() {
 
   async function handleImageUpload(event: React.ChangeEvent<HTMLInputElement>) {
     try {
-      if (!event.target.files || event.target.files.length === 0 || !artist) {
+      if (!event.target.files || event.target.files.length === 0 || !teamMember) {
         return
       }
 
       const file = event.target.files[0]
       const fileExt = file.name.split('.').pop()
-      const filePath = `${artist.id}.${fileExt}`
+      const filePath = `${teamMember.id}.${fileExt}`
 
       const { error: uploadError } = await supabase.storage
-        .from('artists')
+        .from('team-members')
         .upload(filePath, file, { upsert: true })
 
       if (uploadError) throw uploadError
 
       const { data: { publicUrl } } = supabase.storage
-        .from('artists')
+        .from('team-members')
         .getPublicUrl(filePath)
 
       const { error: updateError } = await supabase
-        .from('artists')
+        .from('team_members')
         .update({ avatar_url: publicUrl })
-        .eq('id', artist.id)
+        .eq('id', teamMember.id)
 
       if (updateError) throw updateError
 
       // Update local state
-      setArtist({
-        ...artist,
+      setTeamMember({
+        ...teamMember,
         avatar_url: publicUrl
       })
 
@@ -100,12 +99,12 @@ export default function ArtistProfile() {
     )
   }
 
-  if (!artist) {
+  if (!teamMember) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">Artist Not Found</h2>
-          <Button onClick={() => navigate('/artists')}>Back to Artists</Button>
+          <h2 className="text-2xl font-bold mb-4">Team Member Not Found</h2>
+          <Button onClick={() => navigate('/teams')}>Back to Team</Button>
         </div>
       </div>
     )
@@ -144,10 +143,10 @@ export default function ArtistProfile() {
         <div className="max-w-4xl mx-auto space-y-8">
           <Button 
             variant="ghost" 
-            onClick={() => navigate("/artists")}
+            onClick={() => navigate("/teams")}
             className="mb-4"
           >
-            ← Back to Artists
+            ← Back to Team
           </Button>
 
           <div className="relative">
@@ -156,10 +155,10 @@ export default function ArtistProfile() {
               <div className="flex flex-col md:flex-row gap-8 items-start">
                 <div className="relative">
                   <Avatar className="w-32 h-32">
-                    <AvatarImage src={artist.avatar_url || ""} alt={artist.name} />
-                    <AvatarFallback>{artist.name.charAt(0)}</AvatarFallback>
+                    <AvatarImage src={teamMember.avatar_url || ""} alt={teamMember.name} />
+                    <AvatarFallback>{teamMember.name.charAt(0)}</AvatarFallback>
                   </Avatar>
-                  {user?.id === artist.user_id && (
+                  {user?.id === teamMember.user_id && (
                     <label className="absolute bottom-0 right-0 cursor-pointer">
                       <input
                         type="file"
@@ -174,8 +173,8 @@ export default function ArtistProfile() {
                   )}
                 </div>
                 <div className="space-y-4">
-                  <h1 className="text-3xl font-bold">{artist.name}</h1>
-                  <p className="text-lg text-muted-foreground">{artist.genre} • {artist.style}</p>
+                  <h1 className="text-3xl font-bold">{teamMember.name}</h1>
+                  <p className="text-lg text-muted-foreground">{teamMember.role}</p>
                 </div>
               </div>
             </div>
@@ -185,29 +184,8 @@ export default function ArtistProfile() {
           <div className="space-y-4">
             <h2 className="text-2xl font-semibold">Biography</h2>
             <p className="text-muted-foreground">
-              {artist.bio || "No biography provided yet."}
+              {teamMember.bio || "No biography provided yet."}
             </p>
-          </div>
-
-          {/* Latest Releases */}
-          <div className="space-y-4">
-            <h2 className="text-2xl font-semibold">Latest Releases</h2>
-            <div className="grid gap-4">
-              <div className="p-4 rounded-lg bg-background/80 backdrop-blur-xl border border-border/40">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-accent/10 rounded-md flex items-center justify-center">
-                    <span className="text-xl">🎵</span>
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold">Track Name</h3>
-                    <p className="text-sm text-muted-foreground">3:45 • Released Jan 2024</p>
-                  </div>
-                  <Button variant="outline" size="sm">
-                    Play
-                  </Button>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </section>
