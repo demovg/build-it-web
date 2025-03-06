@@ -19,6 +19,7 @@ import Login from "./pages/Login";
 import SignIn from "./pages/SignIn";
 import Premium from "./pages/Premium";
 import Profile from "./pages/Profile";
+import CreateArtist from "./pages/CreateArtist";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +41,14 @@ const App = () => (
             <Route path="/contact" element={<Contact />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signin" element={<SignIn />} />
+            <Route 
+              path="/create-artist" 
+              element={
+                <ProtectedRoute>
+                  <CreateArtist />
+                </ProtectedRoute>
+              } 
+            />
             <Route 
               path="/premium" 
               element={

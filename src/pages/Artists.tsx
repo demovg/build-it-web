@@ -20,10 +20,14 @@ export default function Artists() {
   const navigate = useNavigate()
   const { user } = useAuth()
   const [artists, setArtists] = useState<Artist[]>([])
+  const [userHasArtistProfile, setUserHasArtistProfile] = useState(false)
 
   useEffect(() => {
     fetchArtists()
-  }, [])
+    if (user) {
+      checkUserArtistProfile()
+    }
+  }, [user])
 
   async function fetchArtists() {
     try {
@@ -36,6 +40,23 @@ export default function Artists() {
     } catch (error) {
       console.error('Error fetching artists:', error)
       toast.error('Failed to load artists')
+    }
+  }
+
+  async function checkUserArtistProfile() {
+    if (!user) return
+    
+    try {
+      const { data, error } = await supabase
+        .from('artists')
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle()
+      
+      if (error) throw error
+      setUserHasArtistProfile(!!data)
+    } catch (error) {
+      console.error('Error checking artist profile:', error)
     }
   }
 
@@ -100,12 +121,20 @@ export default function Artists() {
             </Button>
           </div>
           <div className="flex gap-4">
-            <Button variant="ghost" className="text-white hover:text-accent" onClick={() => navigate("/login")}>
-              Login
-            </Button>
-            <Button variant="ghost" className="text-white hover:text-accent" onClick={() => navigate("/signin")}>
-              Sign Up
-            </Button>
+            {user ? (
+              <Button variant="ghost" className="text-white hover:text-accent" onClick={() => navigate("/profile")}>
+                Profile
+              </Button>
+            ) : (
+              <>
+                <Button variant="ghost" className="text-white hover:text-accent" onClick={() => navigate("/login")}>
+                  Login
+                </Button>
+                <Button variant="ghost" className="text-white hover:text-accent" onClick={() => navigate("/signin")}>
+                  Sign Up
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </nav>
@@ -113,11 +142,21 @@ export default function Artists() {
       {/* Artists Content */}
       <section className="container mx-auto px-4 pt-24">
         <div className="max-w-6xl mx-auto space-y-8">
-          <div className="space-y-4">
-            <h1 className="text-4xl font-bold">Our Artists</h1>
-            <p className="text-muted-foreground">
-              Meet the talented individuals behind the music.
-            </p>
+          <div className="flex items-center justify-between">
+            <div className="space-y-4">
+              <h1 className="text-4xl font-bold">Our Artists</h1>
+              <p className="text-muted-foreground">
+                Meet the talented individuals behind the music.
+              </p>
+            </div>
+            {user && !userHasArtistProfile && (
+              <Button 
+                onClick={() => navigate("/create-artist")} 
+                className="bg-accent hover:bg-accent/90"
+              >
+                Create Artist Profile
+              </Button>
+            )}
           </div>
 
           {/* Artist Grid */}
