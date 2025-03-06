@@ -8,12 +8,11 @@ import { toast } from "sonner"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
-export default function CreateArtist() {
+export default function CreateTeamMember() {
   const navigate = useNavigate()
   const { user } = useAuth()
   const [name, setName] = useState("")
-  const [genre, setGenre] = useState("")
-  const [style, setStyle] = useState("")
+  const [role, setRole] = useState("")
   const [bio, setBio] = useState("")
   const [loading, setLoading] = useState(false)
 
@@ -21,7 +20,7 @@ export default function CreateArtist() {
     e.preventDefault()
     
     if (!user) {
-      toast.error("You must be logged in to create an artist profile")
+      toast.error("You must be logged in to create a team member profile")
       navigate("/login")
       return
     }
@@ -29,32 +28,31 @@ export default function CreateArtist() {
     try {
       setLoading(true)
       
-      // Check if user already has an artist profile
-      const { data: existingArtist, error: checkError } = await supabase
-        .from('artists')
+      // Check if user already has a team member profile
+      const { data: existingMember, error: checkError } = await supabase
+        .from('team_members')
         .select('id')
         .eq('user_id', user.id)
         .maybeSingle()
       
       if (checkError) {
-        console.error('Error checking for existing artist:', checkError)
+        console.error('Error checking for existing team member:', checkError)
         throw checkError
       }
       
-      if (existingArtist) {
-        toast.error("You already have an artist profile")
-        navigate(`/artist/${existingArtist.id}`)
+      if (existingMember) {
+        toast.error("You already have a team member profile")
+        navigate(`/team-member/${existingMember.id}`)
         return
       }
       
-      // Create new artist profile
+      // Create new team member profile
       const { data, error } = await supabase
-        .from('artists')
+        .from('team_members')
         .insert([
           { 
             name, 
-            genre, 
-            style,
+            role,
             bio, 
             user_id: user.id 
           }
@@ -62,19 +60,19 @@ export default function CreateArtist() {
         .select()
       
       if (error) {
-        console.error('Error creating artist profile:', error)
+        console.error('Error creating team member profile:', error)
         throw error
       }
       
       if (data && data.length > 0) {
-        toast.success("Artist profile created successfully!")
-        navigate(`/artist/${data[0].id}`)
+        toast.success("Team member profile created successfully!")
+        navigate(`/team-member/${data[0].id}`)
       } else {
-        throw new Error("No data returned from artist creation")
+        throw new Error("No data returned from team member creation")
       }
     } catch (error: any) {
-      console.error('Error creating artist profile:', error)
-      toast.error(error.message || "Failed to create artist profile")
+      console.error('Error creating team member profile:', error)
+      toast.error(error.message || "Failed to create team member profile")
     } finally {
       setLoading(false)
     }
@@ -124,49 +122,40 @@ export default function CreateArtist() {
         </div>
       </nav>
 
-      {/* Create Artist Form */}
+      {/* Create Team Member Form */}
       <section className="container mx-auto px-4 pt-24 pb-12">
         <div className="max-w-2xl mx-auto">
           <div className="relative">
             <div className="absolute -inset-1 rounded-lg bg-gradient-to-r from-accent to-primary blur-lg opacity-75" />
             <div className="relative bg-background/80 backdrop-blur-xl rounded-lg p-8 shadow-xl border border-border/40">
-              <h1 className="text-3xl font-bold mb-6">Create Artist Profile</h1>
+              <h1 className="text-3xl font-bold mb-6">Join Our Team</h1>
               
               {!user ? (
                 <div className="text-center py-8">
-                  <p className="mb-4">You need to be logged in to create an artist profile.</p>
+                  <p className="mb-4">You need to be logged in to register as a team member.</p>
                   <Button onClick={() => navigate("/login")}>Log In</Button>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="space-y-2">
-                    <Label htmlFor="name">Artist Name</Label>
+                    <Label htmlFor="name">Full Name</Label>
                     <Input
                       id="name"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      placeholder="Your stage name or band name"
+                      placeholder="Your full name"
                       required
                     />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="genre">Genre</Label>
+                    <Label htmlFor="role">Role</Label>
                     <Input
-                      id="genre"
-                      value={genre}
-                      onChange={(e) => setGenre(e.target.value)}
-                      placeholder="e.g. Rock, Hip-Hop, Electronic, etc."
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="style">Style</Label>
-                    <Input
-                      id="style"
-                      value={style}
-                      onChange={(e) => setStyle(e.target.value)}
-                      placeholder="e.g. Alternative, Trap, House, etc."
+                      id="role"
+                      value={role}
+                      onChange={(e) => setRole(e.target.value)}
+                      placeholder="e.g. Developer, Designer, Marketing"
+                      required
                     />
                   </div>
                   
@@ -176,7 +165,7 @@ export default function CreateArtist() {
                       id="bio"
                       value={bio}
                       onChange={(e) => setBio(e.target.value)}
-                      placeholder="Tell us about yourself as an artist..."
+                      placeholder="Tell us about yourself and your experience..."
                       className="w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                       rows={4}
                     />
@@ -187,7 +176,7 @@ export default function CreateArtist() {
                     className="w-full bg-accent hover:bg-accent/90"
                     disabled={loading}
                   >
-                    {loading ? 'Creating...' : 'Create Artist Profile'}
+                    {loading ? 'Submitting...' : 'Join the Team'}
                   </Button>
                 </form>
               )}

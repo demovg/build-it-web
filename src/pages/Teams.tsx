@@ -20,10 +20,31 @@ export default function Teams() {
   const navigate = useNavigate()
   const { user } = useAuth()
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([])
+  const [hasTeamProfile, setHasTeamProfile] = useState(false)
 
   useEffect(() => {
     fetchTeamMembers()
-  }, [])
+    
+    if (user) {
+      checkUserTeamProfile()
+    }
+  }, [user])
+
+  async function checkUserTeamProfile() {
+    try {
+      const { data, error } = await supabase
+        .from('team_members')
+        .select('id')
+        .eq('user_id', user?.id)
+        .maybeSingle()
+        
+      if (error) throw error
+      
+      setHasTeamProfile(!!data)
+    } catch (error) {
+      console.error('Error checking team profile:', error)
+    }
+  }
 
   async function fetchTeamMembers() {
     try {
@@ -114,11 +135,22 @@ export default function Teams() {
       {/* Teams Content */}
       <section className="container mx-auto px-4 pt-24">
         <div className="max-w-6xl mx-auto space-y-8">
-          <div className="space-y-4">
-            <h1 className="text-4xl font-bold">Our Team</h1>
-            <p className="text-muted-foreground">
-              Meet the talented individuals who make it all happen behind the scenes.
-            </p>
+          <div className="flex justify-between items-center">
+            <div className="space-y-4">
+              <h1 className="text-4xl font-bold">Our Team</h1>
+              <p className="text-muted-foreground">
+                Meet the talented individuals who make it all happen behind the scenes.
+              </p>
+            </div>
+            
+            {user && !hasTeamProfile && (
+              <Button 
+                onClick={() => navigate("/create-team-member")} 
+                className="bg-primary hover:bg-primary/90"
+              >
+                Join Our Team
+              </Button>
+            )}
           </div>
 
           {/* Team Categories */}

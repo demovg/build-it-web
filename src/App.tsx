@@ -20,6 +20,7 @@ import SignIn from "./pages/SignIn";
 import Premium from "./pages/Premium";
 import Profile from "./pages/Profile";
 import CreateArtist from "./pages/CreateArtist";
+import CreateTeamMember from "./pages/CreateTeamMember";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +47,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <CreateArtist />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/create-team-member" 
+              element={
+                <ProtectedRoute>
+                  <CreateTeamMember />
                 </ProtectedRoute>
               } 
             />
